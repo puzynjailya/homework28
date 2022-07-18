@@ -7,7 +7,7 @@ datasets_path = '..\datasets'
 fixtures_path = '..\\fixtures'
 
 models = {'ad.csv': 'advertisements.advertisement',
-          'category.csv': "advertisements.category",
+          'category.csv': "categories.category",
           'location.csv': "users.location",
           "user.csv": "users.user"}
 
@@ -24,8 +24,16 @@ def csv_to_json(datasets_path, file_path):
         for rows in csv_reader:
             data = {}
             rows['id'] = int(rows['id'])
-            if file_path == 'ads.csv':
+
+            if file_path == 'ad.csv':
                 rows['is_published'] = rows['is_published'].capitalize()
+
+            if file_path == 'user.csv':
+                rows['age'] = int(rows['age'])
+                rows['location_id'] = int(rows['location_id'])
+            if file_path == 'location.csv':
+                rows['lat'], rows['lng'] = float(rows['lat']), float(rows['lng'])
+
             data['pk'] = int(rows['id'])
             data['model'] = models.get(file_path)
             data['fields'] = rows

@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from ads import settings
 from advertisements import views
@@ -25,8 +25,7 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('ads/', views.AdsListView.as_view(), name='ads'),
     path('ads/<int:pk>', views.AdEntityView.as_view(), name='ad_entity'),
-    path('cats/', views.CategoryListView.as_view(), name='cats'),
-    path('cats/<int:pk>', views.CategoryEntityView.as_view(), name='cat_entity'),
+    path('category/', include('categories.urls')),
 ]
 
 if settings.DEBUG:

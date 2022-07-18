@@ -1,14 +1,16 @@
 import json
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from django.core.exceptions import ValidationError
 
-from advertisements.models import Advertisement, Category
+from advertisements.models import Advertisement
+from categories.models import Category
+from users.models import User
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -36,32 +38,6 @@ class AdsListView(ListView):
             for ad in ads]
         return JsonResponse(response, safe=False, status=200)
 
-    def post(self, request):
-        ad = Advertisement()
-        data = json.loads(request.body)
-
-        ad.name = data.get('name')
-        ad.author = data.get('author')
-        ad.price = data.get('price')
-        ad.description = data.get('description')
-        ad.address = data.get('address')
-        ad.is_published = data.get('is_published')
-
-        try:
-            ad.full_clean()
-        except ValidationError as e:
-            return JsonResponse(e.message_dict, status=422)
-
-        ad.save()
-
-        return JsonResponse({'id': ad.id,
-                            'name': ad.name,
-                            'author': ad.author,
-                            'price': ad.price,
-                            'description': ad.description,
-                            'address': ad.address,
-                            'is_published': ad.is_published}, status=201)
-
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AdEntityView(DetailView):
@@ -82,38 +58,77 @@ class AdEntityView(DetailView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class CategoryListView(ListView):
-    model = Category
+class AdCreateView(CreateView):
+    model = Advertisement
+    fields = []
 
-    def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
 
-        cats = self.object_list
-        response = [{'id': cat.id, "name": cat.name} for cat in cats]
-        return JsonResponse(response, safe=False, status=200)
-
-    def post(self, request):
-        cat = Category()
         data = json.loads(request.body)
 
-        cat.name = data.get('name')
+        author = get_object_or_404(User, pk=data.get('author_id'))
+        category = get_object_or_404(Category, pk=data.get('category_id'))
 
-        try:
-            cat.full_clean()
-        except ValidationError as e:
-            return JsonResponse(e.message_dict, status=422)
+        ad = Advertisement.objects.create(
+            name=data.get('name'),
+            author=author,
+            price=data.get('price'),
+            description=data.get('description'),
+            category=category,
+            is_published=data.get('is_published')
+            )
 
-        cat.save()
+        response = {'id': ad.id,
+                    'name': ad.name,
+                    'author_id': ad.author,
+                    'author': ad.author.first_name,
+                    'price': ad.price,
+                    'description': ad.description,
+                    'is_published': ad.is_published,
+                    'category_id': ad.category_id,
+                    'image': ad.image
+                    }
 
-        return JsonResponse({'id': cat.id, "name": cat.name}, status=201)
+        return JsonResponse(response, status=200)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class CategoryEntityView(DetailView):
-    model = Category
+class AdUpdateView(UpdateView):
+    model = Advertisement
+    fields = ["name", "author_id", "price", "description", "category_id"]
 
-    def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
-        self.object = self.get_object()
+    def patch(self, request, *args, **kwargs):
+        super().post(request, *args, **kwargs)
 
-        return JsonResponse({'id': self.object.id, "name": self.object.name})
+        data = json.loads(request.body)
+
+        self.object.name = data.get('name')
+        self.object.author = get_object_or_404(User, pk=data.get('author_id'))
+        self.object.price = data.get('price')
+        self.object.description = data.get('description')
+        self.object.category = get_object_or_404(Category, pk=data.get('category_id'))
+
+        self.object.save()
+
+        response = {'id': self.object.id,
+                    'name': self.object.name,
+                    'author_id': self.object.author,
+                    'author': self.object.author.first_name,
+                    'price': self.object.price,
+                    'description': self.object.description,
+                    'is_published': self.object.is_published,
+                    'category_id': self.object.category_id,
+                    'image': self.object.image
+                    }
+        return JsonResponse(response, status=200)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AdDeleteView(DeleteView):
+    model = Advertisement
+    success_url = '/'
+
+    def delete(self, request, *args, **kwargs):
+        super(AdDeleteView, self).delete(request, *args, **kwargs)
+
+        return JsonResponse({"status":"ok"}, status=200)
