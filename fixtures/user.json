@@ -1,16 +1,17 @@
 [
     {
-        "pk": 1,
+        "pk": 11,
         "model": "users.user",
         "fields": {
-            "id": 1,
+            "id": 11,
             "first_name": "Павел",
             "last_name": "Никифоров",
             "username": "pnikifirov",
             "password": "gZvptL",
             "role": "member",
             "age": 21,
-            "location_id": 1
+            "location_id": 1,
+            " is_superuser": "false"
         }
     },
     {
@@ -24,7 +25,8 @@
             "password": "4fVqL2",
             "role": "moderator",
             "age": 24,
-            "location_id": 3
+            "location_id": 3,
+            " is_superuser": "false"
         }
     },
     {
@@ -38,7 +40,8 @@
             "password": "o535pj",
             "role": "admin",
             "age": 29,
-            "location_id": 8
+            "location_id": 8,
+            " is_superuser": "false"
         }
     },
     {
@@ -52,7 +55,8 @@
             "password": "d49rSO",
             "role": "moderator",
             "age": 19,
-            "location_id": 10
+            "location_id": 10,
+            " is_superuser": "false"
         }
     },
     {
@@ -66,7 +70,8 @@
             "password": "wCqlVE",
             "role": "member",
             "age": 41,
-            "location_id": 2
+            "location_id": 2,
+            " is_superuser": "false"
         }
     },
     {
@@ -80,7 +85,8 @@
             "password": "xuR2jf",
             "role": "member",
             "age": 37,
-            "location_id": 4
+            "location_id": 4,
+            " is_superuser": "false"
         }
     },
     {
@@ -89,12 +95,13 @@
         "fields": {
             "id": 7,
             "first_name": "Никита",
-            "last_name": "",
+            "last_name": "ВездеПобрито",
             "username": "nikitapro",
             "password": "gzP4vR",
             "role": "member",
             "age": 26,
-            "location_id": 7
+            "location_id": 7,
+            " is_superuser": "false"
         }
     },
     {
@@ -108,7 +115,8 @@
             "password": "zo0rj6",
             "role": "member",
             "age": 24,
-            "location_id": 5
+            "location_id": 5,
+            " is_superuser": "false"
         }
     },
     {
@@ -122,7 +130,8 @@
             "password": "daMocL",
             "role": "moderator",
             "age": 22,
-            "location_id": 9
+            "location_id": 9,
+            " is_superuser": "false"
         }
     },
     {
@@ -136,7 +145,8 @@
             "password": "sasha123456",
             "role": "member",
             "age": 35,
-            "location_id": 6
+            "location_id": 6,
+            " is_superuser": "false"
         }
     }
 ]

@@ -1,12 +1,14 @@
 import json
 
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+from ads import settings
 from categories.models import Category
 
 
@@ -17,8 +19,16 @@ class CategoryListView(ListView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
 
-        cats = self.object_list
-        response = [{'id': cat.id, "name": cat.name} for cat in cats]
+        self.object_list = self.object_list.order_by('name')
+
+        paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
+        page_num = request.GET.get('page')
+        page = paginator.get_page(page_num)
+
+        result = [{'id': cat.id, "name": cat.name} for cat in page]
+        response = {"items": result,
+                    "total": paginator.count,
+                    "page_num": paginator.num_pages}
         return JsonResponse(response, safe=False, status=200)
 
 
@@ -52,7 +62,7 @@ class CategoryEntityView(DetailView):
 @method_decorator(csrf_exempt, name='dispatch')
 class CategoryUpdateView(UpdateView):
     model = Category
-    fields = ['name']
+    fields = ('name',)
 
     def patch(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
