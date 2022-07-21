@@ -18,6 +18,7 @@ class UserListView(ListView):
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
+
         self.object_list = self.object_list.order_by('username').annotate(total=Count('advertisement'))
 
         paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
